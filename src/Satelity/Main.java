@@ -1,36 +1,46 @@
 package Satelity;
 
+import Satelity.KingOfSat;
+
+import java.util.ArrayList;
 import java.util.List;
+
 public class Main {
+    private static ArrayList<String> norad1 = new ArrayList<>();
 
     public static void main(String[] args) {
         Satelity satelity = new Satelity();
+        KingOfSat kingOfSat = new KingOfSat();
+        List<String[]> kingOfSatList = kingOfSat.getSatellitesData();
         List<String[]> satellitesList = satelity.getSatellitesData();
-        List<String[]> transpondersList = satelity.geTransponderstData();
-
+        System.out.println("Satelity ze strony SATBEAM:\n");
         if (satellitesList.isEmpty()) {
             System.out.println("No data retrieved.");
         } else {
-            // Wydrukuj nagłówek tabeli z wyznaczoną szerokością dla każdej kolumny
             System.out.format("%-5s %-10s %-15s %-10s %-15s %-20s %-20s %-25s %-15s %-15s%n", "Orb.Pos.", "Status", "Satellite Name", "NORAD", "COSPAR", "Model", "Operator", "Launch Site", "Launch Mass", "Launch Date");
 
-            // Dla każdego satelity w liście
             for (String[] satellite : satellitesList) {
-                // Wydrukuj dane satelity, każdą kolumnę wyrównaną do lewej i z określoną szerokością
-                System.out.format("%-5s %-10s %-15s %-10s %-15s %-20s %-20s %-25s %-15s %-15s%n", satellite[0], satellite[1], satellite[2], satellite[3], satellite[4], satellite[5], satellite[6], satellite[7], satellite[8], satellite[9]);
+                System.out.println(String.join("  ", satellite));
+                norad1.add(satellite[3]);
             }
         }
-        if (transpondersList.isEmpty()) {
-            System.out.println("No data retrived.");
+
+        if (kingOfSatList.isEmpty()) {
+            System.out.println("No data retrieved.");
         } else {
-            System.out.println("satelliteName orbitalPosition "
-                    + "frequence polarization txp beam standard modulation srFec networkBitrate");
-            for (String[] array : transpondersList) {
-                for (String element : array) {
-                    System.out.print(element + "  ");
+            System.out.printf("%-5s %-10s %-15s %-10s %-15s %-20s %-20s %-25s %-15s", "Orb.Pos.", "Status", "Satellite Name", "satelliteName", "orbitalPosition", "channels", "longitude", "maxDeclination", "norad");
+
+            for (String[] satellite : kingOfSatList) {
+                if(norad1.contains(satellite[5])){
+                    System.out.println(satellite[0] + " - Ta satelita znajduje się również na stronie SATBEAM");
+                    continue;
                 }
-                System.out.println();
+                System.out.println("\nPoniższa satelita nie znajduje się na stronie SATBEAM:\n");
+                System.out.println(String.join("  ", satellite));
+
             }
         }
+
+
     }
 }
