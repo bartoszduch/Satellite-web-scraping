@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -12,9 +13,18 @@ import org.jsoup.select.Elements;
 public class Satelity {
     final String satBeamsUrl = "https://www.satbeams.com/satellites";
     List<String[]> satellitesList = new ArrayList<>();
+    List<String[]> transpondersList = new ArrayList<>();
 
 
     public String orbitalPosition;
+    public String frequence;
+    public String polarization;
+    public String txp;
+    public String beam;
+    public String standard;
+    public String modulation;
+    public String srFec;
+    public String networkBitrate;
     public String status;
     public String satelliteName;
     public String norad;
@@ -67,36 +77,65 @@ public class Satelity {
                 satellitesList.add(new String[]{orbitalPosition, status, satelliteName, norad, cospar, model,
                         operator, launchSite, launchMass, launchDate});
 
-                String hrefValue = cells.get(1).select("a").attr("href");
-                String subpageUrl = "https://www.satbeams.com" + hrefValue;
+                String hrefValue = cells.get(3).select("a").attr("href");
+                String subpageUrl = "https://www.satbeams.com/satellites/"+ cells.get(3).select("a").attr("href");
                 scrapSubpage(subpageUrl);
+                System.out.println(subpageUrl);
                 satelliteCount++;
             }
         }
     }
 
-    /**
-     * Method for scraping data from a subpage.
-     *
-     * @param subpageUrl URL of the subpage.
-     */
     private void scrapSubpage(String subpageUrl) {
         try {
-            final Document subpageDocument = Jsoup.connect(subpageUrl).get();
-            System.out.println("Subpage Scraped Successfully: " + subpageUrl);
+            Connection.Response response = Jsoup.connect(subpageUrl).execute();
+            if (response.statusCode() == 200) {
+                Document document = response.parse();
+
+                Elements data1 = document.select("#table_wrap tbody tr:nth-child(2) td b");
+
+                if (!data1.isEmpty()) {
+                    for (int i = 0; i < (data1.size()) / 2; i++) {
+                        Element data2 = data1.get(i).nextElementSibling();
+
+                        // Sprawdzamy, czy następne rodzeństwo istnieje
+                        if (data2 != null) {
+                            System.out.println("Pobrany tekst: " + data2.text());
+                        } else {
+                            System.out.println("Brak następnego rodzeństwa po elemencie: " + data2.text());
+                        }
+                    }
+
+                } else {
+                    System.out.println("Nie znaleziono elementów dla selektora '#table_wrap tbody tr:nth-child(2) td b'.");
+                }
+
+            } else {
+                System.out.println("Page download failed");
+            }
         } catch (IOException e) {
-            System.err.println("An error occurred while scraping the subpage: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error! Page download failed");
         }
     }
 
     List<String[]> getSatellitesData() {
         return satellitesList;
     }
+    List<String[]> geTransponderstData() {
+        return transpondersList;
+    }
 
     void displaySatellitesData() {
         for (String[] array : satellitesList) {
             for (String element : array) {
+                System.out.print(element + " ");
+            }
+            System.out.println();
+        }
+    }
+    void displayTranspondersData() {
+        for(String[] array : transpondersList) {
+            for(String element : array) {
                 System.out.print(element + " ");
             }
             System.out.println();

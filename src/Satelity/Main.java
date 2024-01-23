@@ -6,6 +6,7 @@ public class Main {
     public static void main(String[] args) {
         Satelity satelity = new Satelity();
         List<String[]> satellitesList = satelity.getSatellitesData();
+        List<String[]> transpondersList = satelity.geTransponderstData();
 
         if (satellitesList.isEmpty()) {
             System.out.println("No data retrieved.");
@@ -17,6 +18,18 @@ public class Main {
             for (String[] satellite : satellitesList) {
                 // Wydrukuj dane satelity, każdą kolumnę wyrównaną do lewej i z określoną szerokością
                 System.out.format("%-5s %-10s %-15s %-10s %-15s %-20s %-20s %-25s %-15s %-15s%n", satellite[0], satellite[1], satellite[2], satellite[3], satellite[4], satellite[5], satellite[6], satellite[7], satellite[8], satellite[9]);
+            }
+        }
+        if (transpondersList.isEmpty()) {
+            System.out.println("No data retrived.");
+        } else {
+            System.out.println("satelliteName orbitalPosition "
+                    + "frequence polarization txp beam standard modulation srFec networkBitrate");
+            for (String[] array : transpondersList) {
+                for (String element : array) {
+                    System.out.print(element + "  ");
+                }
+                System.out.println();
             }
         }
     }
